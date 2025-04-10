@@ -46,14 +46,15 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
 
   async consumeFromQueue(
     queue: string,
-    onMessage: (msg: any) => void,
+    onMessage: (msg: any) => Promise<void>,
   ): Promise<void> {
     try {
       await this.channel.assertQueue(queue);
       this.channel.consume(queue, (msg) => {
         if (msg) {
-          onMessage(this.parseMessage(msg.content));
-          this.channel.ack(msg);
+          onMessage(this.parseMessage(msg.content)).then(() => {
+            this.channel.ack(msg);
+          });
         }
       });
       this.logger.log(`Consuming messages from queue "${queue}"`);

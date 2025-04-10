@@ -69,6 +69,12 @@ export class VectorsService implements OnModuleInit {
   private async initializeScrapeCollection() {
     await this.httpService.axiosRef.put(
       `${this.qdrantBaseUrl}/collections/scrape`,
+      {
+        vectors: {
+          size: 768,
+          distance: 'Cosine',
+        },
+      },
     );
   }
 

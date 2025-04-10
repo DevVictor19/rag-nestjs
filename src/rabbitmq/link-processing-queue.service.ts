@@ -16,7 +16,7 @@ export class LinkProcessingQueueService {
     await this.rabbitMQService.publishToQueue(LINK_PROCESSING_QUEUE, message);
   }
 
-  async consume(callback: (message: LinkProcessingMessage) => void) {
+  async consume(callback: (message: LinkProcessingMessage) => Promise<void>) {
     await this.rabbitMQService.consumeFromQueue(
       LINK_PROCESSING_QUEUE,
       callback,
