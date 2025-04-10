@@ -10,3 +10,32 @@ services:
     restart: unless-stopped
     volumes:
       - ./articles_dataset.csv:/app/articles_dataset.csv
+
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_DEFAULT_USER=admin
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_logs:/var/log/rabbitmq
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_logs:
+  mongo_data:
