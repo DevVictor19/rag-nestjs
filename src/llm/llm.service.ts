@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 
 export interface LLMResponse {
   title: string;
@@ -63,6 +64,20 @@ Return the data in JSON format.
       this.logger.error(error);
       return null;
     }
+  }
+
+  async generateAnswerUsingKnowledge(knowledge: string[], query: string) {
+    const runMessages: (SystemMessage | HumanMessage)[] = [
+      new SystemMessage(
+        'You are a helpful assistant that can answer questions based on the following articles:',
+      ),
+      ...knowledge.map((k) => new HumanMessage(k)),
+      new HumanMessage(query),
+    ];
+
+    const { content } = await this.llm.invoke(runMessages);
+
+    return content as string;
   }
 
   private cleanAiJsonResponse(response: string): string {

@@ -4,6 +4,7 @@ import { LLMModule } from './llm/llm.module';
 import { ConfigModule } from '@nestjs/config';
 import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 import { DatabaseModule } from './database/database.module';
+import { VectorsModule } from './vectors/vectors.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { DatabaseModule } from './database/database.module';
     LLMModule,
     RabbitmqModule,
     DatabaseModule,
+    VectorsModule,
   ],
   controllers: [],
   providers: [],
