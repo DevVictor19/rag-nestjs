@@ -25,29 +25,41 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    await this.channel.close();
-    await this.connection.close();
-    this.logger.log('RabbitMQ disconnected');
+    try {
+      await this.channel.close();
+      await this.connection.close();
+      this.logger.log('RabbitMQ disconnected');
+    } catch (error) {
+      this.logger.error('Error disconnecting from RabbitMQ', error);
+    }
   }
 
   async publishToQueue(queue: string, message: any): Promise<void> {
-    await this.channel.assertQueue(queue);
-    this.channel.sendToQueue(queue, this.prepareMessage(message));
-    this.logger.log(`Message sent to queue "${queue}"`);
+    try {
+      await this.channel.assertQueue(queue);
+      this.channel.sendToQueue(queue, this.prepareMessage(message));
+      this.logger.log(`Message sent to queue "${queue}"`);
+    } catch (error) {
+      this.logger.error('Error publishing to RabbitMQ', error);
+    }
   }
 
   async consumeFromQueue(
     queue: string,
     onMessage: (msg: any) => void,
   ): Promise<void> {
-    await this.channel.assertQueue(queue);
-    this.channel.consume(queue, (msg) => {
-      if (msg) {
-        onMessage(this.parseMessage(msg.content));
-        this.channel.ack(msg);
-      }
-    });
-    this.logger.log(`Consuming messages from queue "${queue}"`);
+    try {
+      await this.channel.assertQueue(queue);
+      this.channel.consume(queue, (msg) => {
+        if (msg) {
+          onMessage(this.parseMessage(msg.content));
+          this.channel.ack(msg);
+        }
+      });
+      this.logger.log(`Consuming messages from queue "${queue}"`);
+    } catch (error) {
+      this.logger.error('Error consuming from RabbitMQ', error);
+    }
   }
 
   private prepareMessage(message: any) {
