@@ -1,99 +1,193 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Develops Today LLM Challenge
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+![Application Processing Flow](images/develops-today-chall.png)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project is a web scraping and LLM-powered content analysis system built with NestJS. It scrapes articles from various sources, processes them using LLM (Language Learning Model), and stores them in a vector database for semantic search capabilities.
 
-## Description
+## Application Flow
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The application follows a multi-step processing flow as shown in the diagram above:
 
-## Project setup
+1. **CSV Upload & Initial Processing**
 
-```bash
-$ pnpm install
-```
+   - Users upload a CSV file containing article URLs through the `/scraper/upload-csv` endpoint
+   - The system processes the CSV and extracts URLs and sources
 
-## Compile and run the project
+2. **Message Queue Processing**
 
-```bash
-# development
-$ pnpm run start
+   - URLs are published to a RabbitMQ queue for asynchronous processing
+   - This ensures reliable handling of large numbers of URLs
 
-# watch mode
-$ pnpm run start:dev
+3. **Web Scraping**
 
-# production mode
-$ pnpm run start:prod
-```
+   - The system fetches content from each URL
+   - HTML content is cleaned and converted to markdown format
+   - Scraped data is stored in MongoDB
 
-## Run tests
+4. **LLM Processing**
 
-```bash
-# unit tests
-$ pnpm run test
+   - The scraped content is processed by the LLM (Google Gemini)
+   - Content is analyzed and transformed into knowledge representations
 
-# e2e tests
-$ pnpm run test:e2e
+5. **Vector Storage**
 
-# test coverage
-$ pnpm run test:cov
-```
+   - Processed content is stored in the Qdrant vector database
+   - This enables semantic search capabilities
 
-## Deployment
+6. **Query Processing**
+   - Users can interact with the system through the `/agent` endpoint
+   - The system uses the stored vector embeddings to provide relevant responses
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Features
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- Web scraping of articles
+- LLM-powered content analysis
+- Vector database integration for semantic search
+- RabbitMQ for message queuing
+- MongoDB for data storage
+- RESTful API endpoints
+
+## Prerequisites
+
+- Node.js (v16 or higher)
+- pnpm package manager
+- MongoDB
+- RabbitMQ
+- Qdrant vector database
+- Google Gemini API key
+
+## Installation
+
+1. Clone the repository:
 
 ```bash
-$ pnpm install -g mau
-$ mau deploy
+git clone <repository-url>
+cd develops-today-llm-challenge
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+2. Install dependencies:
 
-## Resources
+```bash
+pnpm install
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+3. Create a `.env` file based on `.env.example`:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+cp .env.example .env
+```
 
-## Support
+4. Update the `.env` file with your configuration:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Set your Gemini API key
+- Configure MongoDB connection details
+- Set RabbitMQ URL
+- Configure Qdrant URL
 
-## Stay in touch
+## Environment Variables
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+The following environment variables are required for the application to function properly:
+
+### LLM Configuration
+
+- `GEMINI_API_KEY`: Your Google Gemini API key for LLM operations
+
+### Database Configuration
+
+- `DB_URI`: MongoDB connection URI (e.g., `mongodb://localhost:27017`)
+- `DB_NAME`: Name of the MongoDB database
+- `DB_USER`: MongoDB username
+- `DB_PASSWORD`: MongoDB password
+- `DB_PORT`: MongoDB port (default: 27017)
+
+### Message Queue Configuration
+
+- `RABBITMQ_URL`: RabbitMQ connection URL (e.g., `amqp://localhost`)
+
+### Vector Database Configuration
+
+- `QDRANT_URL`: Qdrant vector database URL (e.g., `http://localhost:6333`)
+
+### Example .env file:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key
+RABBITMQ_URL=amqp://localhost
+
+DB_URI=mongodb://localhost:27017
+DB_NAME=scraper
+DB_USER=admin
+DB_PASSWORD=admin
+DB_PORT=27017
+
+QDRANT_URL=http://localhost:6333
+```
+
+## Running the Application
+
+### Development Mode
+
+```bash
+pnpm start:dev
+```
+
+### Production Mode
+
+```bash
+pnpm build
+pnpm start:prod
+```
+
+### Using Docker
+
+```bash
+docker compose up -d
+```
+
+## API Endpoints
+
+### Scraper Endpoint
+
+- `POST /scraper/upload-csv` - Upload a CSV file containing article URLs to be scraped
+  - Accepts a multipart form-data with a 'file' field containing the CSV
+  - CSV should contain 'URL' and 'Source' columns
+
+### Agent Endpoint
+
+- `POST /agent` - Generate a prompt using the LLM
+  - Request body should contain a 'query' field with the text to process
+  - Returns the generated prompt
+
+## Project Structure
+
+- `src/scraper/` - Web scraping functionality
+- `src/llm/` - Language Learning Model integration
+- `src/vectors/` - Vector database operations
+- `src/rabbitmq/` - Message queue handling
+- `src/database/` - Database operations and models
+
+## Testing
+
+Run the test suite:
+
+```bash
+pnpm test
+```
+
+Run tests with coverage:
+
+```bash
+pnpm test:cov
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is licensed under the UNLICENSED license.
