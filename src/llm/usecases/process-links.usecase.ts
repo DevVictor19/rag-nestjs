@@ -22,37 +22,41 @@ export class ProcessLinksUsecase implements OnModuleInit {
   }
 
   private async execute(message: Message) {
-    const { url, source } = message;
-    const cleanedPageHtml = await this.scraperService.getCleanedPageHtml(url);
-    const markdown =
-      await this.scraperService.parseHtmlToMarkdown(cleanedPageHtml);
+    try {
+      const { url, source } = message;
+      const cleanedPageHtml = await this.scraperService.getCleanedPageHtml(url);
+      const markdown =
+        await this.scraperService.parseHtmlToMarkdown(cleanedPageHtml);
 
-    const scrapeData = await this.scraperService.getScrapeData(url);
+      const scrapeData = await this.scraperService.getScrapeData(url);
 
-    if (scrapeData) {
-      this.logger.log('Scrape data already exists');
+      if (scrapeData) {
+        this.logger.log('Scrape data already exists');
 
-      console.log(scrapeData);
+        console.log(scrapeData);
 
-      return;
+        return;
+      }
+
+      const data = await this.llmService.extractDataFromMarkdown(markdown);
+
+      this.logger.log('Scrape data extracted');
+
+      if (!data) {
+        this.logger.error('No data extracted');
+        return;
+      }
+
+      const entity = new ScrapeData();
+      entity.url = url;
+      entity.source = source;
+      entity.title = data.title;
+      entity.content = data.content;
+      entity.date = data.date;
+
+      await this.scraperService.saveScrapeData(entity);
+    } catch (error) {
+      this.logger.error('Error processing link', error);
     }
-
-    const data = await this.llmService.extractDataFromMarkdown(markdown);
-
-    this.logger.log('Scrape data extracted');
-
-    if (!data) {
-      this.logger.error('No data extracted');
-      return;
-    }
-
-    const entity = new ScrapeData();
-    entity.url = url;
-    entity.source = source;
-    entity.title = data.title;
-    entity.content = data.content;
-    entity.date = data.date;
-
-    await this.scraperService.saveScrapeData(entity);
   }
 }
