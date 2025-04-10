@@ -18,7 +18,7 @@ export class ScrapeData {
   title: string;
 
   @Prop({ required: true })
-  content: string;
+  paragraphs: string[];
 
   @Prop({ required: true })
   date: string;

@@ -51,7 +51,7 @@ export class ProcessLinksUsecase implements OnModuleInit {
       entity.url = url;
       entity.source = source;
       entity.title = data.title;
-      entity.content = data.content;
+      entity.paragraphs = data.paragraphs;
       entity.date = data.date;
 
       await this.scraperService.saveScrapeData(entity);
