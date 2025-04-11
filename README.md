@@ -1,4 +1,4 @@
-# Develops Today LLM Challenge
+# RAG NestJS
 
 ![Application Processing Flow](images/develops-today-chall.png)
 
