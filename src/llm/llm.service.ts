@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 
-export interface LLMResponse {
+export type LLMResponse = {
   title: string;
   paragraphs: string[];
   date: string;
